@@ -34,12 +34,21 @@ type Parser struct {
 	envPrefix       string
 }
 
-func NewParser() *Parser {
+// Option is a functional option for configuring a Parser
+type Option func(*Parser)
+
+// NewParser creates a new parser with the given options
+func NewParser(opts ...Option) *Parser {
 	p := &Parser{
 		flagSet:    flag.NewFlagSet("config", flag.ContinueOnError),
 		fields:     make([]fieldInfo, 0),
 		flagValues: make(map[string]string),
 		boolFlags:  make(map[string]*bool),
+	}
+
+	// Apply options
+	for _, opt := range opts {
+		opt(p)
 	}
 
 	// Add help flag
@@ -50,21 +59,24 @@ func NewParser() *Parser {
 }
 
 // WithDisableAutoEnv disables automatic generation of environment variable names
-func (p *Parser) WithDisableAutoEnv() *Parser {
-	p.disableAutoEnv = true
-	return p
+func WithDisableAutoEnv() Option {
+	return func(p *Parser) {
+		p.disableAutoEnv = true
+	}
 }
 
 // WithDisableAutoFlag disables automatic generation of CLI flag names
-func (p *Parser) WithDisableAutoFlag() *Parser {
-	p.disableAutoFlag = true
-	return p
+func WithDisableAutoFlag() Option {
+	return func(p *Parser) {
+		p.disableAutoFlag = true
+	}
 }
 
 // WithEnvPrefix sets a prefix for all environment variable names
-func (p *Parser) WithEnvPrefix(prefix string) *Parser {
-	p.envPrefix = prefix
-	return p
+func WithEnvPrefix(prefix string) Option {
+	return func(p *Parser) {
+		p.envPrefix = prefix
+	}
 }
 
 func (p *Parser) Parse(config any) error {

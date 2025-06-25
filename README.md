@@ -126,17 +126,18 @@ You can disable automatic generation of environment variables or CLI flags:
 
 ```go
 // Disable auto-generation of environment variables
-parser := configlib.NewParser().WithDisableAutoEnv()
+parser := configlib.NewParser(configlib.WithDisableAutoEnv())
 err := parser.Parse(&cfg)
 
 // Disable auto-generation of CLI flags
-parser := configlib.NewParser().WithDisableAutoFlag()
+parser := configlib.NewParser(configlib.WithDisableAutoFlag())
 err := parser.Parse(&cfg)
 
 // Disable both
-parser := configlib.NewParser().
-    WithDisableAutoEnv().
-    WithDisableAutoFlag()
+parser := configlib.NewParser(
+    configlib.WithDisableAutoEnv(),
+    configlib.WithDisableAutoFlag(),
+)
 err := parser.Parse(&cfg)
 ```
 
@@ -151,7 +152,7 @@ You can add a prefix to all environment variable names:
 
 ```go
 // Add "MYAPP_" prefix to all env vars
-parser := configlib.NewParser().WithEnvPrefix("MYAPP_")
+parser := configlib.NewParser(configlib.WithEnvPrefix("MYAPP_"))
 err := parser.Parse(&cfg)
 ```
 
@@ -170,7 +171,7 @@ type Config struct {
     }
 }
 
-parser := configlib.NewParser().WithEnvPrefix("MYAPP_")
+parser := configlib.NewParser(configlib.WithEnvPrefix("MYAPP_"))
 ```
 
 ## Supported Types
@@ -228,10 +229,11 @@ The library provides several options to customize parsing behavior:
 
 ```go
 // Create a parser with custom options
-parser := configlib.NewParser().
-    WithDisableAutoEnv().      // Disable auto-generation of env var names
-    WithDisableAutoFlag().     // Disable auto-generation of CLI flag names
-    WithEnvPrefix("MYAPP_")    // Add prefix to all env var names
+parser := configlib.NewParser(
+    configlib.WithDisableAutoEnv(),    // Disable auto-generation of env var names
+    configlib.WithDisableAutoFlag(),   // Disable auto-generation of CLI flag names
+    configlib.WithEnvPrefix("MYAPP_"), // Add prefix to all env var names
+)
 
 err := parser.Parse(&cfg)
 ```
@@ -266,10 +268,11 @@ type Config struct {
 func main() {
     var cfg Config
     
-    parser := configlib.NewParser().
-        WithDisableAutoEnv().
-        WithDisableAutoFlag().
-        WithEnvPrefix("MYAPP_")
+    parser := configlib.NewParser(
+        configlib.WithDisableAutoEnv(),
+        configlib.WithDisableAutoFlag(),
+        configlib.WithEnvPrefix("MYAPP_"),
+    )
     
     if err := parser.Parse(&cfg); err != nil {
         log.Fatal(err)

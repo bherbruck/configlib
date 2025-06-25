@@ -48,7 +48,7 @@ type ConfigWithPrefix struct {
 func main() {
 	fmt.Println("=== Example 1: Disable Auto-Generation of Environment Variables ===")
 	var cfg1 ConfigNoAutoEnv
-	parser1 := configlib.NewParser().WithDisableAutoEnv()
+	parser1 := configlib.NewParser(configlib.WithDisableAutoEnv())
 	err := parser1.Parse(&cfg1)
 	if err != nil {
 		log.Printf("Error parsing config: %v", err)
@@ -60,7 +60,7 @@ func main() {
 
 	fmt.Println("=== Example 2: Disable Auto-Generation of CLI Flags ===")
 	var cfg2 ConfigNoAutoFlag
-	parser2 := configlib.NewParser().WithDisableAutoFlag()
+	parser2 := configlib.NewParser(configlib.WithDisableAutoFlag())
 	err = parser2.Parse(&cfg2)
 	if err != nil {
 		log.Printf("Error parsing config: %v", err)
@@ -74,7 +74,7 @@ func main() {
 	fmt.Println("Environment variables will be prefixed with 'MYAPP_'")
 	fmt.Println("e.g., HOST -> MYAPP_HOST, Database.Name -> MYAPP_DATABASE_NAME")
 	var cfg3 ConfigWithPrefix
-	parser3 := configlib.NewParser().WithEnvPrefix("MYAPP_")
+	parser3 := configlib.NewParser(configlib.WithEnvPrefix("MYAPP_"))
 	err = parser3.Parse(&cfg3)
 	if err != nil {
 		log.Printf("Error parsing config: %v", err)
@@ -87,9 +87,10 @@ func main() {
 	fmt.Println("=== Example 4: Combine Multiple Options ===")
 	fmt.Println("Disable auto-flags AND add env prefix")
 	var cfg4 ConfigWithPrefix
-	parser4 := configlib.NewParser().
-		WithDisableAutoFlag().
-		WithEnvPrefix("APP_")
+	parser4 := configlib.NewParser(
+		configlib.WithDisableAutoFlag(),
+		configlib.WithEnvPrefix("APP_"),
+	)
 	err = parser4.Parse(&cfg4)
 	if err != nil {
 		log.Printf("Error parsing config: %v", err)

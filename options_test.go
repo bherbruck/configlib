@@ -36,7 +36,7 @@ func TestDisableAutoEnv(t *testing.T) {
 	defer func() { os.Args = oldArgs }()
 
 	var cfg Config
-	parser := configlib.NewParser().WithDisableAutoEnv()
+	parser := configlib.NewParser(configlib.WithDisableAutoEnv())
 	err := parser.Parse(&cfg)
 	if err != nil {
 		t.Fatalf("Parse failed: %v", err)
@@ -72,7 +72,7 @@ func TestDisableAutoFlag(t *testing.T) {
 	defer func() { os.Args = oldArgs }()
 
 	var cfg Config
-	parser := configlib.NewParser().WithDisableAutoFlag()
+	parser := configlib.NewParser(configlib.WithDisableAutoFlag())
 	err := parser.Parse(&cfg)
 	if err != nil {
 		t.Fatalf("Parse failed: %v", err)
@@ -120,7 +120,7 @@ func TestEnvPrefix(t *testing.T) {
 	defer func() { os.Args = oldArgs }()
 
 	var cfg Config
-	parser := configlib.NewParser().WithEnvPrefix("MYAPP_")
+	parser := configlib.NewParser(configlib.WithEnvPrefix("MYAPP_"))
 	err := parser.Parse(&cfg)
 	if err != nil {
 		t.Fatalf("Parse failed: %v", err)
@@ -165,7 +165,7 @@ func TestEnvPrefixNoDoublePrefixing(t *testing.T) {
 	defer func() { os.Args = oldArgs }()
 
 	var cfg Config
-	parser := configlib.NewParser().WithEnvPrefix("MYAPP_")
+	parser := configlib.NewParser(configlib.WithEnvPrefix("MYAPP_"))
 	err := parser.Parse(&cfg)
 	if err != nil {
 		t.Fatalf("Parse failed: %v", err)
@@ -208,10 +208,11 @@ func TestCombinedOptions(t *testing.T) {
 	defer func() { os.Args = oldArgs }()
 
 	var cfg Config
-	parser := configlib.NewParser().
-		WithDisableAutoEnv().
-		WithDisableAutoFlag().
-		WithEnvPrefix("APP_")
+	parser := configlib.NewParser(
+		configlib.WithDisableAutoEnv(),
+		configlib.WithDisableAutoFlag(),
+		configlib.WithEnvPrefix("APP_"),
+	)
 	err := parser.Parse(&cfg)
 	if err != nil {
 		t.Fatalf("Parse failed: %v", err)
