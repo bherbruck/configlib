@@ -32,9 +32,9 @@ func TestMultipleMissingRequiredFields(t *testing.T) {
 
 	// Check that the error message contains all missing fields
 	expectedFields := []string{
-		"Server.Host (env: SERVER_HOST, cli: --server-host)",
-		"Database.Host (env: DB_HOST, cli: --db-host)",
-		"Database.Password (env: DB_PASSWORD, cli: --db-password)",
+		"Server.Host (env: SERVER_HOST, flag: --server-host)",
+		"Database.Host (env: DB_HOST, flag: --db-host)",
+		"Database.Password (env: DB_PASSWORD, flag: --db-password)",
 	}
 
 	if !strings.Contains(errMsg, "missing required fields:") {

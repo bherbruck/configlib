@@ -10,13 +10,13 @@ import (
 func TestDisableAutoEnv(t *testing.T) {
 	type Config struct {
 		// Should NOT have auto-generated env var
-		Field1 string `cli:"field1" default:"default1"`
+		Field1 string `flag:"field1" default:"default1"`
 		// Should have explicit env var
-		Field2 string `env:"EXPLICIT_ENV" cli:"field2"`
+		Field2 string `env:"EXPLICIT_ENV" flag:"field2"`
 		// Nested struct
 		Nested struct {
 			// Should NOT have auto-generated env var
-			Field3 string `cli:"field3"`
+			Field3 string `flag:"field3"`
 		}
 	}
 
@@ -63,7 +63,7 @@ func TestDisableAutoFlag(t *testing.T) {
 		// Should NOT have auto-generated CLI flag
 		Field1 string `env:"FIELD1" default:"default1"`
 		// Should have explicit CLI flag
-		Field2 string `env:"FIELD2" cli:"field2"`
+		Field2 string `env:"FIELD2" flag:"field2"`
 	}
 
 	// Test with CLI args - only field2 should work
@@ -83,7 +83,7 @@ func TestDisableAutoFlag(t *testing.T) {
 		t.Errorf("Field1: expected 'default1', got '%s'", cfg.Field1)
 	}
 
-	// Field2 should use CLI value (explicit cli tag)
+	// Field2 should use CLI value (explicit flag tag)
 	if cfg.Field2 != "from_cli2" {
 		t.Errorf("Field2: expected 'from_cli2', got '%s'", cfg.Field2)
 	}
@@ -187,9 +187,9 @@ func TestCombinedOptions(t *testing.T) {
 		// Only env var (auto-flag disabled)
 		Field1 string `env:"FIELD1"`
 		// Only CLI flag (auto-env disabled)
-		Field2 string `cli:"field2"`
+		Field2 string `flag:"field2"`
 		// Both explicit
-		Field3 string `env:"FIELD3" cli:"field3"`
+		Field3 string `env:"FIELD3" flag:"field3"`
 		// Default only (both auto disabled)
 		Field4 string `default:"default4"`
 	}

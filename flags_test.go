@@ -86,9 +86,9 @@ func TestMultipleFlags(t *testing.T) {
 
 			// Define config with multiple flags
 			type Config struct {
-				Host   string `env:"HOST" cli:"host,H" default:"localhost" desc:"Server host"`
-				Port   int    `env:"PORT" cli:"port,p" default:"8080" desc:"Server port"`
-				Debug  bool   `env:"DEBUG" cli:"debug,d" desc:"Enable debug mode"`
+				Host   string `env:"HOST" flag:"host,H" default:"localhost" desc:"Server host"`
+				Port   int    `env:"PORT" flag:"port,p" default:"8080" desc:"Server port"`
+				Debug  bool   `env:"DEBUG" flag:"debug,d" desc:"Enable debug mode"`
 				APIKey string `env:"API_KEY" required:"true" desc:"API key"`
 			}
 
@@ -204,8 +204,8 @@ func TestSliceConfig(t *testing.T) {
 }
 
 type SliceConfig struct {
-	Hosts []string `env:"HOSTS" cli:"hosts" default:"localhost,127.0.0.1"`
-	Ports []string `env:"PORTS" cli:"ports"`
+	Hosts []string `env:"HOSTS" flag:"hosts" default:"localhost,127.0.0.1"`
+	Ports []string `env:"PORTS" flag:"ports"`
 }
 
 // Helper function to compare string slices

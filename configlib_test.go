@@ -10,21 +10,21 @@ import (
 
 // Test structures used across multiple test files
 type SimpleConfig struct {
-	Host     string `env:"HOST" cli:"host" default:"localhost" desc:"Server host"`
-	Port     int    `env:"PORT" cli:"port" default:"8080" desc:"Server port"`
-	Debug    bool   `env:"DEBUG" cli:"debug" default:"false" desc:"Enable debug mode"`
-	Required string `env:"REQUIRED" cli:"required" required:"true" desc:"Required field"`
+	Host     string `env:"HOST" flag:"host" default:"localhost" desc:"Server host"`
+	Port     int    `env:"PORT" flag:"port" default:"8080" desc:"Server port"`
+	Debug    bool   `env:"DEBUG" flag:"debug" default:"false" desc:"Enable debug mode"`
+	Required string `env:"REQUIRED" flag:"required" required:"true" desc:"Required field"`
 }
 
 type NestedConfig struct {
 	Server struct {
-		Host string `env:"SERVER_HOST" cli:"server-host" required:"true"`
-		Port int    `env:"SERVER_PORT" cli:"server-port" default:"8080"`
+		Host string `env:"SERVER_HOST" flag:"server-host" required:"true"`
+		Port int    `env:"SERVER_PORT" flag:"server-port" default:"8080"`
 	}
 	Database struct {
-		Host     string `env:"DB_HOST" cli:"db-host" required:"true"`
-		Port     int    `env:"DB_PORT" cli:"db-port" default:"5432"`
-		Password string `env:"DB_PASSWORD" cli:"db-password" required:"true"`
+		Host     string `env:"DB_HOST" flag:"db-host" required:"true"`
+		Port     int    `env:"DB_PORT" flag:"db-port" default:"5432"`
+		Password string `env:"DB_PASSWORD" flag:"db-password" required:"true"`
 	}
 }
 

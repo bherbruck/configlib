@@ -13,10 +13,10 @@ func TestHelpWithMultipleFlags(t *testing.T) {
 	os.Args = []string{"test"}
 
 	type Config struct {
-		Host    string `env:"HOST" cli:"host,H" default:"localhost" desc:"Server host"`
-		Port    int    `env:"PORT" cli:"port,p" default:"8080" desc:"Server port"`
-		Debug   bool   `env:"DEBUG" cli:"debug,d" desc:"Enable debug mode"`
-		Verbose bool   `env:"VERBOSE" cli:"verbose,v" desc:"Enable verbose output"`
+		Host    string `env:"HOST" flag:"host,H" default:"localhost" desc:"Server host"`
+		Port    int    `env:"PORT" flag:"port,p" default:"8080" desc:"Server port"`
+		Debug   bool   `env:"DEBUG" flag:"debug,d" desc:"Enable debug mode"`
+		Verbose bool   `env:"VERBOSE" flag:"verbose,v" desc:"Enable verbose output"`
 	}
 
 	var cfg Config
@@ -47,14 +47,14 @@ func TestHelpFlag(t *testing.T) {
 
 func TestHelpOutput(t *testing.T) {
 	type Config struct {
-		Host     string `env:"HOST" cli:"host" default:"localhost" desc:"Server host"`
-		Port     int    `env:"PORT" cli:"port" default:"8080" desc:"Server port"`
-		Debug    bool   `env:"DEBUG" cli:"debug" default:"false" desc:"Enable debug mode"`
-		Required string `env:"REQUIRED" cli:"required" required:"true" desc:"Required field"`
+		Host     string `env:"HOST" flag:"host" default:"localhost" desc:"Server host"`
+		Port     int    `env:"PORT" flag:"port" default:"8080" desc:"Server port"`
+		Debug    bool   `env:"DEBUG" flag:"debug" default:"false" desc:"Enable debug mode"`
+		Required string `env:"REQUIRED" flag:"required" required:"true" desc:"Required field"`
 		Server   struct {
 			TLS struct {
-				Enabled bool   `env:"TLS_ENABLED" cli:"tls-enabled" default:"true" desc:"Enable TLS"`
-				Cert    string `env:"TLS_CERT" cli:"tls-cert" required:"true" desc:"TLS certificate path"`
+				Enabled bool   `env:"TLS_ENABLED" flag:"tls-enabled" default:"true" desc:"Enable TLS"`
+				Cert    string `env:"TLS_CERT" flag:"tls-cert" required:"true" desc:"TLS certificate path"`
 			}
 		}
 	}
@@ -105,8 +105,8 @@ func TestParseWithHelp(t *testing.T) {
 	os.Args = []string{"test"}
 
 	type Config struct {
-		Host     string `env:"HOST" cli:"host" default:"localhost" desc:"Server hostname"`
-		Required string `env:"REQUIRED" cli:"required" required:"true" desc:"API key"`
+		Host     string `env:"HOST" flag:"host" default:"localhost" desc:"Server hostname"`
+		Required string `env:"REQUIRED" flag:"required" required:"true" desc:"API key"`
 	}
 
 	var cfg Config
@@ -136,9 +136,9 @@ func TestParseWithHelp(t *testing.T) {
 
 func ExampleParser_PrintHelp() {
 	type Config struct {
-		Host  string `env:"HOST" cli:"host" default:"localhost" desc:"Server host"`
-		Port  int    `env:"PORT" cli:"port" default:"8080" desc:"Server port"`
-		Debug bool   `env:"DEBUG" cli:"debug" desc:"Enable debug mode"`
+		Host  string `env:"HOST" flag:"host" default:"localhost" desc:"Server host"`
+		Port  int    `env:"PORT" flag:"port" default:"8080" desc:"Server port"`
+		Debug bool   `env:"DEBUG" flag:"debug" desc:"Enable debug mode"`
 	}
 
 	// Clear args to avoid triggering help

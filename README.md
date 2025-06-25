@@ -35,10 +35,10 @@ import (
 )
 
 type Config struct {
-    Host     string `env:"HOST" cli:"host" default:"localhost" desc:"Server host"`
-    Port     int    `env:"PORT" cli:"port" default:"8080" desc:"Server port"`
-    Debug    bool   `env:"DEBUG" cli:"debug" default:"false" desc:"Enable debug mode"`
-    APIKey   string `env:"API_KEY" cli:"api-key" required:"true" desc:"API key"`
+    Host     string `env:"HOST" flag:"host" default:"localhost" desc:"Server host"`
+    Port     int    `env:"PORT" flag:"port" default:"8080" desc:"Server port"`
+    Debug    bool   `env:"DEBUG" flag:"debug" default:"false" desc:"Enable debug mode"`
+    APIKey   string `env:"API_KEY" flag:"api-key" required:"true" desc:"API key"`
 }
 
 func main() {
@@ -53,14 +53,14 @@ func main() {
 
 ### Multiple Flags (Shorthand)
 
-You can specify multiple flags for a single field using comma-separated values in the `cli` tag:
+You can specify multiple flags for a single field using comma-separated values in the `flag` tag:
 
 ```go
 type Config struct {
-    Host    string `env:"HOST" cli:"host,H" desc:"Server host"`
-    Port    int    `env:"PORT" cli:"port,p" desc:"Server port"`
-    Debug   bool   `env:"DEBUG" cli:"debug,d" desc:"Enable debug mode"`
-    Verbose bool   `env:"VERBOSE" cli:"verbose,v" desc:"Enable verbose output"`
+    Host    string `env:"HOST" flag:"host,H" desc:"Server host"`
+    Port    int    `env:"PORT" flag:"port,p" desc:"Server port"`
+    Debug   bool   `env:"DEBUG" flag:"debug,d" desc:"Enable debug mode"`
+    Verbose bool   `env:"VERBOSE" flag:"verbose,v" desc:"Enable verbose output"`
 }
 ```
 
@@ -81,13 +81,13 @@ This allows both long and short forms:
 ```go
 type Config struct {
     Server struct {
-        Host string `env:"SERVER_HOST" cli:"server-host" required:"true"`
-        Port int    `env:"SERVER_PORT" cli:"server-port" default:"8080"`
+        Host string `env:"SERVER_HOST" flag:"server-host" required:"true"`
+        Port int    `env:"SERVER_PORT" flag:"server-port" default:"8080"`
     }
     Database struct {
-        Host     string `env:"DB_HOST" cli:"db-host" required:"true"`
-        Port     int    `env:"DB_PORT" cli:"db-port" default:"5432"`
-        Password string `env:"DB_PASSWORD" cli:"db-password" required:"true"`
+        Host     string `env:"DB_HOST" flag:"db-host" required:"true"`
+        Port     int    `env:"DB_PORT" flag:"db-port" default:"5432"`
+        Password string `env:"DB_PASSWORD" flag:"db-password" required:"true"`
     }
 }
 ```
@@ -98,9 +98,9 @@ When multiple required fields are missing, configlib collects all errors and rep
 
 ```
 missing required fields:
-  - Server.Host (env: SERVER_HOST, cli: --server-host)
-  - Database.Host (env: DB_HOST, cli: --db-host)
-  - Database.Password (env: DB_PASSWORD, cli: --db-password)
+  - Server.Host (env: SERVER_HOST, flag: --server-host)
+  - Database.Host (env: DB_HOST, flag: --db-host)
+  - Database.Password (env: DB_PASSWORD, flag: --db-password)
 ```
 
 This makes it easy to identify all missing configuration at once, rather than discovering them one at a time.
@@ -108,14 +108,14 @@ This makes it easy to identify all missing configuration at once, rather than di
 ## Struct Tags
 
 - `env`: Name of the environment variable (auto-generated if not specified)
-- `cli`: Name of the CLI flag (auto-generated if not specified). Supports multiple flags separated by commas (e.g., `cli:"host,h"` for both `--host` and `-h`)
+- `flag`: Name of the CLI flag (auto-generated if not specified). Supports multiple flags separated by commas (e.g., `flag:"host,h"` for both `--host` and `-h`)
 - `default`: Default value if not provided via env or CLI
 - `required`: Set to "true" to make the field required
 - `desc`: Description for the CLI flag help text
 
 ## Auto-naming Convention
 
-If you don't specify `env` or `cli` tags, they are automatically generated:
+If you don't specify `env` or `flag` tags, they are automatically generated:
 
 - Environment variables: `FieldPath` → `FIELD_PATH` (e.g., `Server.Host` → `SERVER_HOST`)
 - CLI flags: `FieldPath` → `field-path` (e.g., `Server.Host` → `server-host`)
@@ -143,7 +143,7 @@ err := parser.Parse(&cfg)
 
 When auto-generation is disabled:
 - Fields without explicit `env` tags won't be configurable via environment variables
-- Fields without explicit `cli` tags won't be configurable via CLI flags
+- Fields without explicit `flag` tags won't be configurable via CLI flags
 - Fields can still use default values
 
 ### Environment Variable Prefixes
@@ -251,13 +251,13 @@ import (
 
 type Config struct {
     // Only configurable via CLI flag (auto-env disabled)
-    Host string `cli:"host" default:"localhost"`
+    Host string `flag:"host" default:"localhost"`
     
     // Only configurable via env var (auto-flag disabled)
     Port int `env:"PORT" default:"8080"`
     
     // Explicitly defined both
-    Debug bool `env:"DEBUG" cli:"debug,d"`
+    Debug bool `env:"DEBUG" flag:"debug,d"`
     
     // Will have MYAPP_ prefix: MYAPP_DATABASE_URL
     Database struct {

@@ -11,13 +11,13 @@ import (
 // Example 1: Disable auto-generation of env vars
 type ConfigNoAutoEnv struct {
 	// This field will NOT have an auto-generated env var name
-	Host string `json:"host" cli:"host" default:"localhost" desc:"Server host"`
+	Host string `json:"host" flag:"host" default:"localhost" desc:"Server host"`
 
 	// This field WILL have the explicit env var name
-	Port int `json:"port" env:"PORT" cli:"port" default:"8080" desc:"Server port"`
+	Port int `json:"port" env:"PORT" flag:"port" default:"8080" desc:"Server port"`
 
 	// This field will have no env var at all
-	Debug bool `json:"debug" cli:"debug" default:"false" desc:"Enable debug mode"`
+	Debug bool `json:"debug" flag:"debug" default:"false" desc:"Enable debug mode"`
 }
 
 // Example 2: Disable auto-generation of CLI flags
@@ -26,7 +26,7 @@ type ConfigNoAutoFlag struct {
 	Host string `json:"host" env:"HOST" default:"localhost" desc:"Server host"`
 
 	// This field WILL have the explicit CLI flag
-	Port int `json:"port" env:"PORT" cli:"port" default:"8080" desc:"Server port"`
+	Port int `json:"port" env:"PORT" flag:"port" default:"8080" desc:"Server port"`
 
 	// This field will have no CLI flag at all
 	Debug bool `json:"debug" env:"DEBUG" default:"false" desc:"Enable debug mode"`
@@ -34,14 +34,14 @@ type ConfigNoAutoFlag struct {
 
 // Example 3: Add prefix to env vars
 type ConfigWithPrefix struct {
-	Host  string `json:"host" env:"HOST" cli:"host" default:"localhost" desc:"Server host"`
-	Port  int    `json:"port" env:"PORT" cli:"port" default:"8080" desc:"Server port"`
-	Debug bool   `json:"debug" cli:"debug" default:"false" desc:"Enable debug mode"`
+	Host  string `json:"host" env:"HOST" flag:"host" default:"localhost" desc:"Server host"`
+	Port  int    `json:"port" env:"PORT" flag:"port" default:"8080" desc:"Server port"`
+	Debug bool   `json:"debug" flag:"debug" default:"false" desc:"Enable debug mode"`
 
 	// Nested struct - auto-generated env names will also get the prefix
 	Database struct {
-		Name string `json:"name" cli:"db-name" desc:"Database name"`
-		User string `json:"user" cli:"db-user" desc:"Database user"`
+		Name string `json:"name" flag:"db-name" desc:"Database name"`
+		User string `json:"user" flag:"db-user" desc:"Database user"`
 	} `json:"database"`
 }
 

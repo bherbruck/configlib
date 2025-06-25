@@ -181,10 +181,10 @@ func (p *Parser) parseFieldTags(field reflect.StructField, path string, value re
 		}
 	}
 
-	// Parse cli tag
-	if cliTag := field.Tag.Get("cli"); cliTag != "" {
+	// Parse flag tag
+	if flagTag := field.Tag.Get("flag"); flagTag != "" {
 		// Split by comma to support multiple flags
-		flags := strings.Split(cliTag, ",")
+		flags := strings.Split(flagTag, ",")
 		for i, flag := range flags {
 			flags[i] = strings.TrimSpace(flag)
 		}
@@ -312,7 +312,7 @@ func (p *Parser) applyValues() error {
 				sources = append(sources, fmt.Sprintf("env: %s", field.EnvName))
 			}
 			if field.CliName != "" {
-				sources = append(sources, fmt.Sprintf("cli: --%s", field.CliName))
+				sources = append(sources, fmt.Sprintf("flag: --%s", field.CliName))
 			}
 			missingFields = append(missingFields, fmt.Sprintf("%s (%s)",
 				field.FieldPath, strings.Join(sources, ", ")))

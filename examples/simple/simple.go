@@ -8,14 +8,14 @@ import (
 )
 
 type Config struct {
-	Host     string `json:"host" env:"HOST" cli:"host" default:"localhost" desc:"Server host"`
-	Port     int    `json:"port" env:"PORT" cli:"p,port" default:"8080" desc:"Server port"`
-	Debug    bool   `json:"debug" env:"DEBUG" cli:"d,debug" default:"false" desc:"Enable debug mode"`
-	Required string `json:"required" env:"REQUIRED" cli:"required" required:"true" desc:"Required field"`
+	Host     string `json:"host" env:"HOST" flag:"host" default:"localhost" desc:"Server host"`
+	Port     int    `json:"port" env:"PORT" flag:"p,port" default:"8080" desc:"Server port"`
+	Debug    bool   `json:"debug" env:"DEBUG" flag:"d,debug" default:"false" desc:"Enable debug mode"`
+	Required string `json:"required" env:"REQUIRED" flag:"required" required:"true" desc:"Required field"`
 	Server   struct {
 		TLS struct {
-			Enabled bool   `json:"enabled" env:"TLS_ENABLED" cli:"t,tls-enabled" default:"true" desc:"Enable TLS"`
-			Cert    string `json:"cert" env:"TLS_CERT" cli:"tls-cert" required:"true" desc:"TLS certificate path"`
+			Enabled bool   `json:"enabled" env:"TLS_ENABLED" flag:"t,tls-enabled" default:"true" desc:"Enable TLS"`
+			Cert    string `json:"cert" env:"TLS_CERT" flag:"tls-cert" required:"true" desc:"TLS certificate path"`
 		} `json:"tls"`
 	} `json:"server"`
 }
