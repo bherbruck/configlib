@@ -221,6 +221,185 @@ func slicesEqual(a, b []string) bool {
 	return true
 }
 
+func TestFloatConfig(t *testing.T) {
+	tests := []struct {
+		name     string
+		envVars  map[string]string
+		cliArgs  []string
+		expected FloatConfig
+	}{
+		{
+			name:    "default float values",
+			envVars: map[string]string{},
+			cliArgs: []string{},
+			expected: FloatConfig{
+				Rate:       1.5,
+				Percentage: 0.0,
+				Precision:  0.0,
+			},
+		},
+		{
+			name: "env var floats",
+			envVars: map[string]string{
+				"RATE":       "2.5",
+				"PERCENTAGE": "85.7",
+				"PRECISION":  "0.001",
+			},
+			cliArgs: []string{},
+			expected: FloatConfig{
+				Rate:       2.5,
+				Percentage: 85.7,
+				Precision:  0.001,
+			},
+		},
+		{
+			name: "cli override floats",
+			envVars: map[string]string{
+				"RATE": "2.5",
+			},
+			cliArgs: []string{"--rate", "3.14", "--percentage", "99.9", "-p", "0.0001"},
+			expected: FloatConfig{
+				Rate:       3.14,
+				Percentage: 99.9,
+				Precision:  0.0001,
+			},
+		},
+		{
+			name: "mixed float sources",
+			envVars: map[string]string{
+				"PERCENTAGE": "75.0",
+			},
+			cliArgs: []string{"--rate", "1.618"},
+			expected: FloatConfig{
+				Rate:       1.618,
+				Percentage: 75.0,
+				Precision:  0.0,
+			},
+		},
+		{
+			name: "negative floats",
+			envVars: map[string]string{
+				"RATE": "-1.5",
+			},
+			cliArgs: []string{"--percentage", "-10.5"},
+			expected: FloatConfig{
+				Rate:       -1.5,
+				Percentage: -10.5,
+				Precision:  0.0,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Clear environment
+			os.Clearenv()
+
+			// Set environment variables
+			for k, v := range tt.envVars {
+				os.Setenv(k, v)
+			}
+
+			// Set CLI args
+			oldArgs := os.Args
+			os.Args = append([]string{"test"}, tt.cliArgs...)
+			defer func() { os.Args = oldArgs }()
+
+			// Reset flag.CommandLine
+			resetFlagCommandLine()
+
+			// Parse config
+			var cfg FloatConfig
+			err := configlib.Parse(&cfg)
+
+			if err != nil {
+				t.Fatalf("Parse() error = %v", err)
+			}
+
+			// Check values with tolerance for floating point comparison
+			const tolerance = 1e-9
+			if abs(cfg.Rate-tt.expected.Rate) > tolerance {
+				t.Errorf("Rate = %f, want %f", cfg.Rate, tt.expected.Rate)
+			}
+			if abs(float64(cfg.Percentage)-float64(tt.expected.Percentage)) > tolerance {
+				t.Errorf("Percentage = %f, want %f", cfg.Percentage, tt.expected.Percentage)
+			}
+			if abs(cfg.Precision-tt.expected.Precision) > tolerance {
+				t.Errorf("Precision = %f, want %f", cfg.Precision, tt.expected.Precision)
+			}
+		})
+	}
+}
+
+func TestFloatValidation(t *testing.T) {
+	tests := []struct {
+		name        string
+		cliArgs     []string
+		expectError bool
+	}{
+		{
+			name:        "valid float",
+			cliArgs:     []string{"--rate", "3.14"},
+			expectError: false,
+		},
+		{
+			name:        "invalid float",
+			cliArgs:     []string{"--rate", "not-a-number"},
+			expectError: true,
+		},
+		{
+			name:        "scientific notation",
+			cliArgs:     []string{"--rate", "1.23e-4"},
+			expectError: false,
+		},
+		{
+			name:        "integer as float",
+			cliArgs:     []string{"--rate", "42"},
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Clear environment
+			os.Clearenv()
+
+			// Set CLI args
+			oldArgs := os.Args
+			os.Args = append([]string{"test"}, tt.cliArgs...)
+			defer func() { os.Args = oldArgs }()
+
+			// Reset flag.CommandLine
+			resetFlagCommandLine()
+
+			// Parse config
+			var cfg FloatConfig
+			err := configlib.Parse(&cfg)
+
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error but got none")
+			}
+			if !tt.expectError && err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+type FloatConfig struct {
+	Rate       float64 `env:"RATE" flag:"rate,r" default:"1.5" desc:"Processing rate"`
+	Percentage float32 `env:"PERCENTAGE" flag:"percentage" desc:"Success percentage"`
+	Precision  float64 `env:"PRECISION" flag:"precision,p" desc:"Calculation precision"`
+}
+
+// Helper function for absolute value
+func abs(x float64) float64 {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 // Helper function to reset flag.CommandLine
 func resetFlagCommandLine() {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)

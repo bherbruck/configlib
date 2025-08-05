@@ -220,6 +220,8 @@ func (p *Parser) registerFlags() {
 				p.flagSet.Func(flagName, field.Description, p.createStringHandler(field.CliName))
 			case reflect.Int:
 				p.flagSet.Func(flagName, field.Description, p.createIntHandler(field.CliName))
+			case reflect.Float32, reflect.Float64:
+				p.flagSet.Func(flagName, field.Description, p.createFloatHandler(field.CliName))
 			case reflect.Bool:
 				// Use BoolVar for boolean flags so they don't require a value
 				boolPtr := new(bool)
@@ -263,6 +265,16 @@ func (p *Parser) createBoolHandler(flagName string) func(string) error {
 		}
 		if _, err := strconv.ParseBool(s); err != nil {
 			return fmt.Errorf("invalid boolean value: %s", s)
+		}
+		p.flagValues[flagName] = s
+		return nil
+	}
+}
+
+func (p *Parser) createFloatHandler(flagName string) func(string) error {
+	return func(s string) error {
+		if _, err := strconv.ParseFloat(s, 64); err != nil {
+			return fmt.Errorf("invalid float value: %s", s)
 		}
 		p.flagValues[flagName] = s
 		return nil
@@ -345,6 +357,12 @@ func (p *Parser) setFieldValue(field fieldInfo, value string) error {
 			return err
 		}
 		field.Value.SetInt(int64(intVal))
+	case reflect.Float32, reflect.Float64:
+		floatVal, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return err
+		}
+		field.Value.SetFloat(floatVal)
 	case reflect.Bool:
 		boolVal, err := strconv.ParseBool(value)
 		if err != nil {
