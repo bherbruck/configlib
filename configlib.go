@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type fieldInfo struct {
@@ -215,11 +216,19 @@ func (p *Parser) registerFlags() {
 
 		// Register all flag names for this field
 		for _, flagName := range field.CliNames {
+			// Check for time.Duration first (special case)
+			if field.Type.String() == "time.Duration" {
+				p.flagSet.Func(flagName, field.Description, p.createDurationHandler(field.CliName))
+				continue
+			}
+
 			switch field.Type.Kind() {
 			case reflect.String:
 				p.flagSet.Func(flagName, field.Description, p.createStringHandler(field.CliName))
-			case reflect.Int:
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 				p.flagSet.Func(flagName, field.Description, p.createIntHandler(field.CliName))
+			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				p.flagSet.Func(flagName, field.Description, p.createUintHandler(field.CliName))
 			case reflect.Float32, reflect.Float64:
 				p.flagSet.Func(flagName, field.Description, p.createFloatHandler(field.CliName))
 			case reflect.Bool:
@@ -275,6 +284,26 @@ func (p *Parser) createFloatHandler(flagName string) func(string) error {
 	return func(s string) error {
 		if _, err := strconv.ParseFloat(s, 64); err != nil {
 			return fmt.Errorf("invalid float value: %s", s)
+		}
+		p.flagValues[flagName] = s
+		return nil
+	}
+}
+
+func (p *Parser) createUintHandler(flagName string) func(string) error {
+	return func(s string) error {
+		if _, err := strconv.ParseUint(s, 10, 64); err != nil {
+			return fmt.Errorf("invalid unsigned integer value: %s", s)
+		}
+		p.flagValues[flagName] = s
+		return nil
+	}
+}
+
+func (p *Parser) createDurationHandler(flagName string) func(string) error {
+	return func(s string) error {
+		if _, err := time.ParseDuration(s); err != nil {
+			return fmt.Errorf("invalid duration value: %s", s)
 		}
 		p.flagValues[flagName] = s
 		return nil
@@ -348,15 +377,31 @@ func (p *Parser) applyValues() error {
 }
 
 func (p *Parser) setFieldValue(field fieldInfo, value string) error {
-	switch field.Type.Kind() {
-	case reflect.String:
-		field.Value.SetString(value)
-	case reflect.Int:
-		intVal, err := strconv.Atoi(value)
+	// Handle time.Duration first (special case)
+	if field.Type.String() == "time.Duration" {
+		duration, err := time.ParseDuration(value)
 		if err != nil {
 			return err
 		}
-		field.Value.SetInt(int64(intVal))
+		field.Value.Set(reflect.ValueOf(duration))
+		return nil
+	}
+
+	switch field.Type.Kind() {
+	case reflect.String:
+		field.Value.SetString(value)
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		intVal, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return err
+		}
+		field.Value.SetInt(intVal)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		uintVal, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			return err
+		}
+		field.Value.SetUint(uintVal)
 	case reflect.Float32, reflect.Float64:
 		floatVal, err := strconv.ParseFloat(value, 64)
 		if err != nil {
